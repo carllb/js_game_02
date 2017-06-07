@@ -57,7 +57,6 @@ entities.applyToSprite = function(entity_data,sprite){
 }
 
 entities.entitiesLookup = {
-
   entity: function(entity_data) {
     const p = new PIXI.Graphics();
     p.beginFill(0x9bea00);
