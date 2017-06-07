@@ -1,29 +1,43 @@
-exports.Packet = function Packet(pID, cID) {
+var packets = {};
+
+packets.Packet = function Packet(pID, cID) {
   this.pID = pID;
   this.cID = cID;
   return this;
 }
 
-exports.PacketJoined = function PacketJoined(cID, entities) {
-  exports.Packet.apply(this,["joined",cID]);
+packets.PacketJoined = function PacketJoined(cID, entities) {
+  packets.Packet.apply(this,["joined",cID]);
   this.entities = entities;
   return this;
 }
 
-exports.packetLookupOnServer = {
-
+packets.PacketClientReady = function(cID){
+  packets.Packet.apply(this,["clientReady", cID]);
+  return this;
 }
 
-exports.packetLookupOnClient = {
+packets.packetLookupOnServer = {
+  clientReady: function(packet,serverData){
+    // send world infor to client
+
+
+    serverData.clients[packet.cID].isReady = true;
+  }
+}
+
+packets.packetLookupOnClient = {
   joined: function(packet,stage){
     stage.removeChildren();
     stage.cID = packet.cID;
     ents = packet.entities;
     for (i = 0; i < ents.size; i++){
-      loadEntityToStage(stage,ents[i]);
+      entities.loadEntityToStage(stage,ents[i]);
     }
   }
 }
 
-
-module.exports = exports;
+// client wont have module defined but the server will
+if (typeof module !== 'undefined'){
+  module.exports = packets;
+}

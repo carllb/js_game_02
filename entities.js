@@ -1,6 +1,7 @@
-var exports;
+var entities = {};
 
 function genBlankTexture(){
+  const p = new PIXI.Graphics();
   p.beginFill(0x000000);
   p.lineStyle(0);
   p.drawRect(0,0,1,1);
@@ -8,7 +9,7 @@ function genBlankTexture(){
   return p.generateCanvasTexture();
 }
 
-exports.Entity = function Entity(eInID,x,y,vx,vy,w,h) {
+entities.Entity = function Entity(eInID,x,y,vx,vy,w,h) {
   this.eID = "entity";
   this.eInID = eInID;
   this.x = x;
@@ -20,7 +21,7 @@ exports.Entity = function Entity(eInID,x,y,vx,vy,w,h) {
   return this;
 }
 
-exports.Entity.prototype.onUpdate = function() {
+entities.Entity.prototype.onUpdate = function() {
   if(this.vx !=0 || this.vy != 0){
     this.x += this.vx;
     this.y += this.vy;
@@ -30,32 +31,32 @@ exports.Entity.prototype.onUpdate = function() {
   }
 }
 
-function loadEntityToStage(stage,entity_data){
-  s = exports.entitiesLookup[entity_data.eID](entity_data);
+entities.loadEntityToStage = function(stage,entity_data){
+  s = entities.entitiesLookup[entity_data.eID](entity_data);
 
   // need to make sure that an index out of bounds will not be thrown
   si = stage.children.length;
   if (entity_data.eInID <= si){
     stage.addChildAt(s,entity_data.eInID);
   }else{
-    blankSprite = new Sprite(genBlankTexture());
+    blankSprite = new PIXI.Sprite(genBlankTexture());
     // fills in blanks sprites that should get replaced later
     while(si < entity_data.eInID){
       stage.addChild(blankSprite);
       si++;
     }
+    stage.addChildAt(s,entity_data.eInID);
   }
 }
 
-
-function applyToSprite(entity_data,sprite){
+entities.applyToSprite = function(entity_data,sprite){
   sprite.x = entity_data.x;
   sprite.y = entity_data.y;
   sprite.vx = entity_data.vx;
   sprite.vy = entity_data.vy;
 }
 
-exports.entitiesLookup = {
+entities.entitiesLookup = {
 
   entity: function(entity_data) {
     const p = new PIXI.Graphics();
@@ -64,9 +65,12 @@ exports.entitiesLookup = {
     p.drawCircle(30,30,10);
     p.endFill();
     s = new Sprite(p.generateCanvasTexture());
-    applyToSprite(entity_data,s);
+    entities.applyToSprite(entity_data,s);
     return s;
   }
 }
 
-module.exports = exports;
+// client wont have module defined but the server will
+if (typeof module !== 'undefined'){
+  module.exports = entities;
+}
