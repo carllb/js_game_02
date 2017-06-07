@@ -33,13 +33,15 @@ packets.packetLookupOnClient = {
     client.stage.removeChildren();
     client.stage.cID = packet.cID;
     ents = packet.entities;
-    for (i = 0; i < ents.size; i++){
-      entities.loadEntityToStage(stage,ents[i]);
+    for (i = 0; i < ents.length; i++){
+      console.log(ents[i]);
+      entities.loadEntityToStage(client.stage,ents[i]);
     }
+    client.render();
     p = new packets.PacketClientReady(client.stage.cID);
     data = JSON.stringify(p);
     client.sendData(data);
-    client.render();
+
   },
 
   updateEntity: function(packet,client){

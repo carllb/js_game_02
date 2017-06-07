@@ -30,6 +30,7 @@ var serverData = {
 
 function serverInit() {
   serverData.serverObj = ws.createServer(clientConnected);
+  serverData.serverObj.listen(8001);
   console.log("Server Started!");
   testEntity = new entities.Entity(-1,20,20,0,0,20,20);
   spawnEntity(testEntity);
@@ -41,18 +42,20 @@ function serverInit() {
 
 function clientConnected(conn){
   console.log("Client connected!");
-  conn.on("text", reciveData);
+  conn.on("text", receiveData);
   cli = new ClientInstance(conn);
   serverData.clients.push(cli);
   // the way it chooses the client id is weird but its to be thread safe
   cli.cID = serverData.clients.indexOf(cli);
   // send the level info to the client
-  p = new packets.PacketJoined(cli.cID,entities);
+  p = new packets.PacketJoined(cli.cID,serverData.entities);
   data = JSON.stringify(p);
   conn.sendText(data);
 }
 
 function receiveData(data){
+  console.log("recived data");
+  console.log(data);
   p = JSON.parse(data);
   packets.packetLookupOnServer[p.pID](p,serverData);
 }

@@ -63,7 +63,7 @@ entities.entitiesLookup = {
     p.lineStyle(0);
     p.drawCircle(30,30,10);
     p.endFill();
-    s = new Sprite(p.generateCanvasTexture());
+    s = new PIXI.Sprite(p.generateCanvasTexture());
     entities.applyToSprite(entity_data,s);
     return s;
   }
