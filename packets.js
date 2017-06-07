@@ -17,22 +17,36 @@ packets.PacketClientReady = function(cID){
   return this;
 }
 
+packets.PacketUpdateEntity = function(cID, entity_data){
+  packets.Packet.apply(this,["updateEntity", cID]);
+  this.entity_data = entity_data;
+}
+
 packets.packetLookupOnServer = {
   clientReady: function(packet,serverData){
-    // send world infor to client
-
-
     serverData.clients[packet.cID].isReady = true;
   }
 }
 
 packets.packetLookupOnClient = {
-  joined: function(packet,stage){
-    stage.removeChildren();
-    stage.cID = packet.cID;
+  joined: function(packet,client){
+    client.stage.removeChildren();
+    client.stage.cID = packet.cID;
     ents = packet.entities;
     for (i = 0; i < ents.size; i++){
       entities.loadEntityToStage(stage,ents[i]);
+    }
+    p = new packets.PacketClientReady(client.stage.cID);
+    data = JSON.stringify(p);
+    client.sendData(data);
+    client.render();
+  },
+
+  updateEntity: function(packet,client){
+    eInID = packet.entity_data.eInID
+    // checks to make sure the client has the specified entity
+    if(client.stage.children.length > eInID){
+      entities.applyToSprite(pacjet.entity_data,client.stage.getChildAt(eInID));
     }
   }
 }
